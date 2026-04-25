@@ -1,0 +1,2 @@
+main_prompt_path: prompts/main_prompt.txt
+few_shot_path: prompts/few_shot_examples.txt

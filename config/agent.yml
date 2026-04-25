@@ -1,0 +1,8 @@
+output_dir: data/output
+sample_dir: data/samples
+max_image_count: 3
+supported_formats:
+  - jpg
+  - jpeg
+  - png
+  - bmp

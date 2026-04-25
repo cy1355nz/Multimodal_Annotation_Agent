@@ -1,0 +1,444 @@
+### Few-Shot Examples for Multimodal Annotation Agent
+
+These examples demonstrate how to convert natural language scene descriptions into structured JSON annotations.
+Follow the exact format and use only the allowed enum values defined in the schema.
+
+---
+
+#### Example 1: Simple Highway Scene with Static Obstacle
+
+**Input Description:**
+"Sunny day, ego vehicle driving on urban expressway. White foam box exists in the right lane ahead, about 15 meters away. Ego vehicle should slow down and slightly move left to avoid it."
+
+**Expected Output:**
+{
+  "driving_environment": {
+    "weather": "sunny",
+    "time": "day",
+    "visibility": "good",
+    "road_type": "Highway"
+  },
+  "lanes": [
+    {
+      "lane_id": "Lane1",
+      "bbox": [0, 400, 800, 600],
+      "is_ego": true,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane2",
+      "bbox": [800, 400, 1600, 600],
+      "is_ego": false,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    }
+  ],
+  "static_objects": [
+    {
+      "obj_id": "obj_1",
+      "bbox": [600, 300, 650, 340],
+      "type": "plastic_bag",
+      "compressible": "Yes",
+      "position": "front_right"
+    }
+  ],
+  "ego_vehicle": {
+    "lateral_action": "nudge_left",
+    "longitudinal_action": "decelerate",
+    "reason": "Avoid foam box in right lane ahead"
+  },
+  "scene_description": "Sunny day, ego vehicle driving on urban expressway. White foam box exists in the right lane ahead, about 15 meters away. Ego vehicle should slow down and slightly move left to avoid it."
+}
+
+**Key Points:**
+- Use `nudge_left` for slight lateral movement (not full lane change)
+- Use `decelerate` when slowing down is needed
+- Static object position is `front_right` relative to ego vehicle
+- All required fields present: obj_id, bbox, type for static_objects
+
+---
+
+#### Example 2: Complex Urban Intersection with Traffic Light and Multiple Vehicles
+
+**Input Description:**
+"Cloudy dusk at urban intersection. Traffic light is red with 15 seconds countdown. Three sedans are queued ahead in same lane, all stationary. One SUV is turning left from adjacent lane. Pedestrian crossing sign visible on roadside. Ego vehicle should stop and wait."
+
+**Expected Output:**
+{
+  "driving_environment": {
+    "weather": "cloudy",
+    "time": "dusk",
+    "visibility": "moderate",
+    "road_type": "Urban_Road"
+  },
+  "lanes": [
+    {
+      "lane_id": "Lane1",
+      "bbox": [0, 400, 600, 600],
+      "is_ego": true,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane2",
+      "bbox": [600, 400, 1200, 600],
+      "is_ego": false,
+      "lane_type": "turning_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane3",
+      "bbox": [1200, 400, 1800, 600],
+      "is_ego": false,
+      "lane_type": "driving_lane",
+      "direction": "opposite_direction"
+    }
+  ],
+  "traffic_lights": [
+    {
+      "light_id": "light_1",
+      "bbox": [700, 20, 750, 80],
+      "color": "red",
+      "state": "solid",
+      "countdown": 15,
+      "applicable_lanes": ["Lane1"]
+    }
+  ],
+  "traffic_signs": [
+    {
+      "sign_id": "sign_1",
+      "bbox": [100, 50, 150, 100],
+      "type": "pedestrian_crossing",
+      "content": null,
+      "applicable_lanes": ["Lane1", "Lane2"]
+    }
+  ],
+  "vehicles": [
+    {
+      "obj_id": "vehicle_1",
+      "bbox": [200, 250, 350, 380],
+      "type": "sedan",
+      "orientation": "rear",
+      "behavior": "stationary",
+      "interaction_with_ego": "follow"
+    },
+    {
+      "obj_id": "vehicle_2",
+      "bbox": [150, 200, 300, 330],
+      "type": "sedan",
+      "orientation": "rear",
+      "behavior": "stationary",
+      "interaction_with_ego": "follow"
+    },
+    {
+      "obj_id": "vehicle_3",
+      "bbox": [100, 150, 250, 280],
+      "type": "sedan",
+      "orientation": "rear",
+      "behavior": "stationary",
+      "interaction_with_ego": "follow"
+    },
+    {
+      "obj_id": "vehicle_4",
+      "bbox": [700, 180, 900, 350],
+      "type": "SUV",
+      "orientation": "left",
+      "behavior": "turning",
+      "interaction_with_ego": "ignore"
+    }
+  ],
+  "ego_vehicle": {
+    "lateral_action": "keep_lane",
+    "longitudinal_action": "decelerate",
+    "reason": "Stop at red light, wait for vehicles ahead"
+  },
+  "scene_description": "Cloudy dusk at urban intersection. Traffic light is red with 15 seconds countdown. Three sedans are queued ahead in same lane, all stationary. One SUV is turning left from adjacent lane. Pedestrian crossing sign visible on roadside. Ego vehicle should stop and wait."
+}
+
+**Key Points:**
+- Multiple vehicles with different behaviors (stationary vs turning)
+- Traffic light includes `countdown` field (optional but useful)
+- Traffic sign type is `pedestrian_crossing` with content as null
+- Ego vehicle uses `keep_lane` + `decelerate` to stop
+- All required fields present for each object type
+
+---
+
+#### Example 3: Night Rainy Highway with Leading Vehicle
+
+**Input Description:**
+"Night time, heavy rain on highway. Poor visibility. Large truck 50 meters ahead in same lane, moving at steady speed. Taillights visible. Speed limit sign shows 80 km/h. Ego vehicle should maintain safe following distance and keep current speed."
+
+**Expected Output:**
+{
+  "driving_environment": {
+    "weather": "rainy",
+    "time": "night",
+    "visibility": "poor",
+    "road_type": "Highway"
+  },
+  "lanes": [
+    {
+      "lane_id": "Lane1",
+      "bbox": [0, 350, 800, 550],
+      "is_ego": true,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane2",
+      "bbox": [800, 350, 1600, 550],
+      "is_ego": false,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    }
+  ],
+  "traffic_signs": [
+    {
+      "sign_id": "sign_1",
+      "bbox": [50, 30, 120, 90],
+      "type": "speed_limit",
+      "content": "80",
+      "applicable_lanes": ["Lane1", "Lane2"]
+    }
+  ],
+  "vehicles": [
+    {
+      "obj_id": "vehicle_1",
+      "bbox": [350, 150, 650, 400],
+      "type": "truck",
+      "orientation": "rear",
+      "behavior": "moving",
+      "interaction_with_ego": "follow"
+    }
+  ],
+  "ego_vehicle": {
+    "lateral_action": "keep_lane",
+    "longitudinal_action": "maintain_speed",
+    "reason": "Maintain safe following distance behind truck in poor visibility"
+  },
+  "scene_description": "Night time, heavy rain on highway. Poor visibility. Large truck 50 meters ahead in same lane, moving at steady speed. Taillights visible. Speed limit sign shows 80 km/h. Ego vehicle should maintain safe following distance and keep current speed."
+}
+
+**Key Points:**
+- Weather is `rainy`, visibility is `poor`
+- Truck behavior is `moving` (not stationary)
+- Speed limit sign has `content: "80"` (string value)
+- Ego vehicle uses `maintain_speed` to keep safe distance
+- Required fields: sign_id, bbox, type for traffic_signs
+
+---
+
+#### Example 4: Foggy Morning with Construction Zone
+
+**Input Description:**
+"Foggy dawn on rural road. Moderate visibility. Construction zone ahead with orange cones blocking right lane. Yellow warning sign indicates road work. Worker vehicle (van) parked on shoulder. Ego vehicle should change to left lane and slow down."
+
+**Expected Output:**
+{
+  "driving_environment": {
+    "weather": "foggy",
+    "time": "dawn",
+    "visibility": "moderate",
+    "road_type": "Rural_Road"
+  },
+  "lanes": [
+    {
+      "lane_id": "Lane1",
+      "bbox": [0, 400, 700, 600],
+      "is_ego": false,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane2",
+      "bbox": [700, 400, 1400, 600],
+      "is_ego": true,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane3",
+      "bbox": [1400, 400, 1800, 600],
+      "is_ego": false,
+      "lane_type": "shoulder",
+      "direction": "same_direction"
+    }
+  ],
+  "traffic_signs": [
+    {
+      "sign_id": "sign_1",
+      "bbox": [100, 60, 180, 120],
+      "type": "warning",
+      "content": "Road Work Ahead",
+      "applicable_lanes": ["Lane1", "Lane2"]
+    }
+  ],
+  "static_objects": [
+    {
+      "obj_id": "obj_1",
+      "bbox": [800, 350, 830, 400],
+      "type": "cone",
+      "compressible": "No",
+      "position": "front"
+    },
+    {
+      "obj_id": "obj_2",
+      "bbox": [850, 350, 880, 400],
+      "type": "cone",
+      "compressible": "No",
+      "position": "front"
+    },
+    {
+      "obj_id": "obj_3",
+      "bbox": [900, 350, 930, 400],
+      "type": "cone",
+      "compressible": "No",
+      "position": "front"
+    }
+  ],
+  "vehicles": [
+    {
+      "obj_id": "vehicle_1",
+      "bbox": [1500, 380, 1750, 520],
+      "type": "van",
+      "orientation": "rear",
+      "behavior": "parked",
+      "interaction_with_ego": "ignore"
+    }
+  ],
+  "ego_vehicle": {
+    "lateral_action": "lane_change_left",
+    "longitudinal_action": "decelerate",
+    "reason": "Avoid construction zone with cones blocking right lane"
+  },
+  "scene_description": "Foggy dawn on rural road. Moderate visibility. Construction zone ahead with orange cones blocking right lane. Yellow warning sign indicates road work. Worker vehicle (van) parked on shoulder. Ego vehicle should change to left lane and slow down."
+}
+
+**Key Points:**
+- Multiple static objects (cones) marking construction zone
+- Van is `parked` on shoulder (not moving)
+- Ego vehicle uses `lane_change_left` (full lane change, not nudge)
+- Warning sign type is `warning` with descriptive content
+- Cones have compressible: "No" (rigid objects)
+
+---
+
+#### Example 5: Snowy Day with Emergency Vehicle
+
+**Input Description:**
+"Snowy day on urban road. Good visibility despite snow. Ambulance with flashing lights approaching from rear in left lane. Police car parked on right shoulder with hazard lights. Ego vehicle should yield to ambulance by moving right and decelerating."
+
+**Expected Output:**
+{
+  "driving_environment": {
+    "weather": "snowy",
+    "time": "day",
+    "visibility": "good",
+    "road_type": "Urban_Road"
+  },
+  "lanes": [
+    {
+      "lane_id": "Lane1",
+      "bbox": [0, 400, 600, 600],
+      "is_ego": false,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane2",
+      "bbox": [600, 400, 1200, 600],
+      "is_ego": true,
+      "lane_type": "driving_lane",
+      "direction": "same_direction"
+    },
+    {
+      "lane_id": "Lane3",
+      "bbox": [1200, 400, 1600, 600],
+      "is_ego": false,
+      "lane_type": "shoulder",
+      "direction": "same_direction"
+    }
+  ],
+  "vehicles": [
+    {
+      "obj_id": "vehicle_1",
+      "bbox": [100, 200, 350, 400],
+      "type": "ambulance",
+      "orientation": "rear",
+      "behavior": "moving",
+      "interaction_with_ego": "yield"
+    },
+    {
+      "obj_id": "vehicle_2",
+      "bbox": [1300, 380, 1550, 520],
+      "type": "police_car",
+      "orientation": "rear",
+      "behavior": "parked",
+      "interaction_with_ego": "ignore"
+    }
+  ],
+  "ego_vehicle": {
+    "lateral_action": "nudge_right",
+    "longitudinal_action": "decelerate",
+    "reason": "Yield to emergency vehicle (ambulance) approaching from rear"
+  },
+  "scene_description": "Snowy day on urban road. Good visibility despite snow. Ambulance with flashing lights approaching from rear in left lane. Police car parked on right shoulder with hazard lights. Ego vehicle should yield to ambulance by moving right and decelerating."
+}
+
+**Key Points:**
+- Special vehicle types: `ambulance`, `police_car` (valid enum values)
+- Ambulance interaction is `yield` (priority vehicle)
+- Ego vehicle uses `nudge_right` + `decelerate` to yield
+- Police car is `parked` with `ignore` interaction
+- All required fields present: obj_id, bbox, type for vehicles
+
+---
+
+### Important Guidelines:
+
+1. **Required Fields (Must Include)**:
+   - **DrivingEnvironment**: weather, time, road_type (visibility is optional)
+   - **LaneInfo**: lane_id, bbox, is_ego (lane_type, direction are optional)
+   - **TrafficSignInfo**: sign_id, bbox, type (content, applicable_lanes are optional)
+   - **TrafficLightInfo**: light_id, bbox, color (state, countdown, applicable_lanes are optional)
+   - **VehicleObject**: obj_id, bbox, type (orientation, behavior, interaction_with_ego are optional)
+   - **StaticObject**: obj_id, bbox, type (compressible, position are optional)
+   - **EgoVehicle**: lateral_action, longitudinal_action (reason is optional)
+
+2. **Enum Values Only**: Always use exact enum values from the schema:
+   - Weather: "sunny", "rainy", "cloudy", "foggy", "snowy", "overcast"
+   - Time: "day", "night", "dawn", "dusk"
+   - Road types: "Highway", "Urban_Road", "Rural_Road", "Tunnel", "Bridge", "Parking_Lot"
+   - Vehicle types: "sedan", "SUV", "truck", "bus", "motorcycle", "bicycle", "van", "taxi", "police_car", "ambulance", "fire_truck"
+   - And all other enum fields as defined in schema
+
+3. **Bbox Format**: All bbox fields must be arrays of 4 floats: [x1, y1, x2, y2]
+
+4. **Optional Fields**: Use `null` in JSON or omit the field entirely if value is unknown
+
+5. **Object IDs**: Use consistent naming convention:
+   - Static objects: obj_1, obj_2, obj_3...
+   - Dynamic vehicles: vehicle_1, vehicle_2, vehicle_3...
+   - Traffic signs: sign_1, sign_2...
+   - Traffic lights: light_1, light_2...
+   - Lanes: Lane1, Lane2, Lane3...
+
+6. **Ego Vehicle Actions**:
+   - `lane_change_left/right`: Full lane change maneuver
+   - `nudge_left/right`: Slight lateral movement to avoid obstacles (stay in same lane)
+   - `keep_lane`: Stay in current lane without lateral movement
+   - Combine with appropriate longitudinal action: accelerate, maintain_speed, or decelerate
+
+7. **Interaction Types** (for vehicles):
+   - `follow`: Maintain distance behind leading vehicle
+   - `yield`: Give way to priority vehicle or pedestrian
+   - `bypass`: Go around obstacle
+   - `ignore`: No interaction needed
+
+8. **Common Mistakes to Avoid**:
+   - Don't use non-enum values (e.g., don't use "car", use "sedan" or specific type)
+   - Don't forget bbox for objects that require it
+   - Don't confuse `nudge` (slight offset) with `lane_change` (full lane switch)
+   - Don't omit required fields (obj_id, bbox, type for most objects)

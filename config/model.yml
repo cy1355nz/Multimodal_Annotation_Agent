@@ -1,0 +1,5 @@
+# Model configuration
+chat_model_name: qwen3.6-max-preview # qwen2.5-vl-7b-instruct # qwen3-vl-235b-a22b-thinking
+embedding_model_name: text-embedding-v4
+temperature: 0.1
+max_tokens: 2000

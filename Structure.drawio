@@ -1,0 +1,49 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="5HGFHK8nOv1vEPxXLALO">
+    <mxGraphModel dx="1207" dy="1840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="System Prompt" vertex="1">
+          <mxGeometry height="60" width="120" x="60" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Few Shot Example" vertex="1">
+          <mxGeometry height="60" width="120" x="60" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Prompt" vertex="1">
+          <mxGeometry height="140" width="120" x="230" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Agent" vertex="1">
+          <mxGeometry height="140" width="120" x="470" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Model_Factory" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Output Parser" vertex="1">
+          <mxGeometry height="140" width="120" x="690" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="CoT" vertex="1">
+          <mxGeometry height="40" width="120" x="910" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="VQA" vertex="1">
+          <mxGeometry height="40" width="120" x="910" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Pre-annotation" vertex="1">
+          <mxGeometry height="40" width="120" x="910" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Memory" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="Tools" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="app" vertex="1">
+          <mxGeometry height="60" width="120" x="690" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="s5oZQ8gklwbCab1pUYhn-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="RAG" vertex="1">
+          <mxGeometry height="60" width="120" x="470" y="-120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
