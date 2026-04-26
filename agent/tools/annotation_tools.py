@@ -175,6 +175,7 @@ def save_annotation_result(json_string: str) -> str:
         # Validate JSON format
         data = json.loads(json_string)
         output_dir = get_abs_path("data/output")
+        os.makedirs(output_dir, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_path = os.path.join(output_dir, f"annotation_{timestamp}.json")
 
