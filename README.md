@@ -20,14 +20,15 @@ A multimodal intelligent annotation assistant based on **VLM** and **LangChain**
 ├── agent/      # Core logics
 │   ├── tools/  # Tools for Agent
 │   │   ├── annotation_tools.py  # tools definitions
-│   │   └── middleware.py     # middleware for tool usage and debug
+│   │   └── middleware.py        # middleware for tool usage and debug
 │   └── annotation_agent.py
 ├── config/     
 ├── models/
-├── prompts/    # System Prompt and few-shot examples
-├── schemas/    # Pydantic data schemas
+├── prompts/        # System Prompt and few-shot examples
+├── sample_data/    # NuScenes Sample data, image + annotated description
+├── schemas/        # Pydantic data schemas
 ├── utils/
-├── run_app.py  # run streamlit
+├── run_app.py      # run streamlit
 ├── requirements.txt/
 └── README.md
 ```
