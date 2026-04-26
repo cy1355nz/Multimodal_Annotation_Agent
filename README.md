@@ -33,3 +33,6 @@ A multimodal intelligent annotation assistant based on **VLM** and **LangChain**
 └── README.md
 ```
 
+
+<img src="Structure.drawio.svg" alt="描述" width="800">
+
