@@ -53,7 +53,7 @@ class AnnotationAgent:
         prompt_used = f"\n**Input Description:**\n{description}\n"
 
         # debug only
-        image_paths = ['/Users/leo/Desktop/Resume/Resume_Prep/Agent-Study/Demo/Multimodal_Annotation_Agent/data/temp/n008-2018-03-14-15-16-29-0400__CAM_FRONT__1521055565282267.jpg']
+        # image_paths = ['/Users/leo/Desktop/Resume/Resume_Prep/Agent-Study/Demo/Multimodal_Annotation_Agent/data/temp/n008-2018-03-14-15-16-29-0400__CAM_FRONT__1521055565282267.jpg']
         if image_paths:
             # 1. Inject paths as text for the Agent's tool calling logic
             path_text = "\n**Available Image Paths for Tools**\n"
