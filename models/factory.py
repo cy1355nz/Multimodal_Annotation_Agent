@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from langchain_core.embeddings import Embeddings
 from langchain_community.chat_models.tongyi import BaseChatModel, ChatTongyi
+from langchain_community.embeddings import DashScopeEmbeddings
 from utils.config_handler import model_conf
 
 
@@ -29,5 +30,16 @@ class ChatModelFactory(BaseModelFactory):
         )
 
 
+class EmbeddingModelFactory(BaseModelFactory):
+    """Factory for creating embedding models."""
+
+    def generator(self) -> Optional[Embeddings]:
+        """Create and return an embedding model instance."""
+        return DashScopeEmbeddings(
+            model=model_conf.get("embedding_model_name", "text-embedding-v4")
+        )
+
+
 # Global chat model instance
 chat_model = ChatModelFactory().generator()
+embedding_model = EmbeddingModelFactory().generator()

@@ -12,7 +12,7 @@ A multimodal intelligent annotation assistant based on **VLM** and **LangChain**
 *   **Multi-Agent Workflow**：Splits the workflow into RetrievalAgent, MemoryAgent, PerceptionAgent, AnnotationWriterAgent, QualityAgent, and PersistenceAgent so each stage is easy to inspect.
 *   **State Management**：Uses an explicit `AnnotationState` object to track request id, image paths, retrieved context, visual observations, drafts, validation errors, review status, feedback, final result, output path, and trace.
 *   **LangChain Tool Calling**：Uses LangChain tools inside the explicit workflow for RAG retrieval (`retrieve_annotation_context`) and schema validation (`validate_json_output`), with tool calls surfaced in trace logs.
-*   **RAG + Approved Case Retrieval**：Retrieves relevant local few-shot examples from `data/RAG/` and human-approved historical cases from `data/memory/annotation_memory.jsonl`.
+*   **Hybrid RAG + Approved Case Retrieval**：Retrieves relevant local few-shot examples from `data/RAG/` and human-approved historical cases from `data/memory/annotation_memory.jsonl` with BM25 + optional embedding similarity over the original natural-language annotation text.
 *   **Deterministic Detection Retrieval**：Retrieves raw vehicle-side detection results by exact `clip_id + timestamp` 
     from `data/detection_db/`, without using embeddings.
 *   **Conversational Memory**：Keeps the current human review loop explicit: pending draft, reviewer feedback, revised draft, approval, and final persistence.
@@ -50,7 +50,7 @@ Output: Structured JSON with annotation results
 ├── agent/
 │   ├── annotation_agent.py      # Multi-agent orchestration and workflow control
 │   ├── memory.py                # Human review state and approved-case memory writer
-│   ├── rag.py                   # Lightweight local RAG store
+│   ├── rag.py                   # Hybrid BM25 + embedding local RAG store
 │   └── tools/
 │       ├── annotation_tools.py  # Validation and legacy annotation tools
 │       ├── detection_tools.py   # Exact clip_id + timestamp detection lookup tool
@@ -92,8 +92,6 @@ Drafts are first shown for human review. Approved runs are saved to `data/output
 
 ## 🔭 Recommended Next Iterations
 
-1. Replace `SimpleRAGStore` with embedding retrieval using `text-embedding-v4` and a vector database such as FAISS/Chroma/Milvus
+1. Replace the in-memory hybrid retriever with a vector database such as FAISS/Chroma/Milvus for larger corpora.
 2. Replace the Streamlit review controls with a richer bbox/action correction UI.
-3. Add an evaluation script with golden JSON cases and schema/semantic scoring.
-4. Add LangGraph when the workflow needs conditional routing, parallel specialist agents, or durable checkpoints.
-
+3. Add LangGraph when the workflow needs conditional routing, parallel specialist agents, or durable checkpoints.

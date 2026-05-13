@@ -1,6 +1,26 @@
 import json
 
-from agent.rag import SimpleRAGStore, _load_approved_memory_documents
+from agent.rag import KnowledgeDocument, SimpleRAGStore, _load_approved_memory_documents
+
+
+class FakeEmbeddings:
+    def embed_documents(self, texts):
+        return [self._embed(text) for text in texts]
+
+    def embed_query(self, text):
+        return self._embed(text)
+
+    def _embed(self, text):
+        text = text.lower()
+        return [
+            1.0 if "ambulance" in text or "emergency" in text else 0.0,
+            1.0 if "traffic" in text or "red" in text else 0.0,
+        ]
+
+
+class FailingEmbeddings:
+    def embed_documents(self, texts):
+        raise RuntimeError("embedding service unavailable")
 
 
 def test_project_rag_loads_data_rag_and_not_prompt_or_sample_dirs(monkeypatch, tmp_path):
@@ -23,9 +43,19 @@ def test_project_rag_loads_data_rag_and_not_prompt_or_sample_dirs(monkeypatch, t
     assert [doc.source for doc in store.documents] == ["rag:traffic_light.md"]
     assert "PROMPT SHOULD NOT LOAD" not in store.documents[0].content
     assert "SAMPLE SHOULD NOT LOAD" not in store.documents[0].content
+    assert store.documents[0].retrieval_text == "red traffic light stop urban road"
 
 
-def test_retrieve_returns_relevant_rag_case():
+def test_retrieve_returns_relevant_rag_case(monkeypatch, tmp_path):
+    project_root = tmp_path
+    rag_dir = project_root / "data" / "RAG"
+    rag_dir.mkdir(parents=True)
+    (rag_dir / "traffic_light.md").write_text(
+        "Input:\nCloudy dusk at an urban intersection with a red traffic light. Ego should stop.\n\nGuidance:\nUse decelerate.",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("agent.rag.get_abs_path", lambda path: str(project_root / path))
+    monkeypatch.setattr("agent.rag.embedding_model", None)
     store = SimpleRAGStore.from_project_defaults()
 
     hits = store.retrieve("red traffic light urban intersection stop", k=2)
@@ -33,6 +63,38 @@ def test_retrieve_returns_relevant_rag_case():
     assert hits
     assert hits[0].source.startswith("rag:")
     assert "traffic" in hits[0].content.lower()
+
+
+def test_hybrid_retrieval_uses_embedding_similarity():
+    store = SimpleRAGStore(
+        [
+            KnowledgeDocument(source="doc:traffic", content="traffic light case", retrieval_text="red signal stop"),
+            KnowledgeDocument(source="doc:emergency", content="ambulance yield case", retrieval_text="ambulance emergency yield"),
+        ],
+        embeddings=FakeEmbeddings(),
+        bm25_weight=0.2,
+        embedding_weight=0.8,
+    )
+
+    hits = store.retrieve("priority emergency vehicle", k=2)
+
+    assert hits[0].source == "doc:emergency"
+    assert hits[0].metadata["embedding_score"] > 0
+
+
+def test_hybrid_retrieval_falls_back_to_bm25_when_embeddings_fail():
+    store = SimpleRAGStore(
+        [
+            KnowledgeDocument(source="doc:traffic", content="traffic light case", retrieval_text="red traffic light stop"),
+            KnowledgeDocument(source="doc:snow", content="snow case", retrieval_text="snowy highway"),
+        ],
+        embeddings=FailingEmbeddings(),
+    )
+
+    hits = store.retrieve("red traffic stop", k=1)
+
+    assert hits[0].source == "doc:traffic"
+    assert hits[0].metadata["embedding_score"] == 0.0
 
 
 def test_empty_query_returns_no_results():
