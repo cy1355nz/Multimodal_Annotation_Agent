@@ -1,5 +1,5 @@
 output_dir: data/output
-sample_dir: data/samples
+sample_dir: sample_data
 max_image_count: 3
 supported_formats:
   - jpg

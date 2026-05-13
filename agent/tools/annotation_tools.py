@@ -63,9 +63,9 @@ def analyze_image(image_path: str) -> str:
                 image_path = temp_path
                 logger.info(f"[analyze_image] Resolved to temp: {image_path}")
 
-            # Strategy 2: Check data/samples/images/
+            # Strategy 2: Check sample_data/images/
             else:
-                sample_path = get_abs_path(os.path.join("data/samples/images", image_path))
+                sample_path = get_abs_path(os.path.join("sample_data/images", image_path))
                 if os.path.exists(sample_path):
                     image_path = sample_path
                     logger.info(f"[analyze_image] Resolved to samples: {image_path}")

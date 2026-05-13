@@ -30,6 +30,9 @@ if "messages" not in st.session_state:
 if "last_result" not in st.session_state:
     st.session_state["last_result"] = None
 
+if "pending_state" not in st.session_state:
+    st.session_state["pending_state"] = None
+
 # Display chat history
 for message in st.session_state["messages"]:
     with st.chat_message(message["role"]):
@@ -56,8 +59,9 @@ with st.sidebar:
     ### 📖 Instructions
     1. Enter natural language description of the driving scene
     2. Upload 1-3 images (optional)
-    3. Click 'Submit' to generate structured annotation
-    4. Download the JSON result
+    3. Generate a structured draft
+    4. Review, approve, or provide feedback
+    5. Download the approved JSON result
     """)
 
 # Main input area
@@ -69,6 +73,19 @@ description = st.text_area(
     placeholder="Example: Sunny day, ego vehicle driving on urban expressway with a white foam box in the right lane ahead. Ego vehicle should slow down and avoid.",
     height=150
 )
+
+st.header("🎞️ Optional Clip Metadata")
+clip_cols = st.columns(2)
+with clip_cols[0]:
+    clip_id = st.text_input(
+        "Clip ID",
+        placeholder="Example: clip_urban_red_light_001",
+    )
+with clip_cols[1]:
+    timestamp = st.text_input(
+        "Timestamp",
+        placeholder="Example: 1521055565282267",
+    )
 
 # File uploader for images
 st.header("🖼️ Upload Images")
@@ -92,7 +109,7 @@ if uploaded_files:
             st.image(uploaded_file, caption=f"Image {idx + 1}", width='content')
 
 # Submit button
-if st.button("🚀 Generate Annotation", type="primary", disabled=not description):
+if st.button("🚀 Generate Draft", type="primary", disabled=not description):
     if description:
         # Add user message to history
         st.session_state["messages"].append({
@@ -112,39 +129,84 @@ if st.button("🚀 Generate Annotation", type="primary", disabled=not descriptio
                     f.write(uploaded_file.getbuffer())
                 image_paths.append(temp_path)
 
-        # Generate annotation
+        # Generate annotation draft for review
         with st.spinner("🤖 Agent is analyzing the scene..."):
-            # try:
-            # capture weird empty list
-            def capture(generator):
-                for chunk in generator:
-                    if not isinstance(chunk, str):
-                        continue
-                    if not chunk or "=====" in chunk or chunk.strip() == "[]":
-                        continue
-                    response_messages.append(chunk)
-                    yield chunk
+            try:
+                with st.chat_message("assistant"):
+                    def capture(generator):
+                        for chunk in generator:
+                            if isinstance(chunk, str) and chunk:
+                                yield chunk
 
-            # Execute agent
-            response_messages = []
-            res_stream = st.session_state["agent"].execute_stream(
-                description=description,
-                image_paths=image_paths if image_paths else None
-            )
-            with st.chat_message("assistant"):
-                response_text = st.write_stream(capture(res_stream))
+                    stream = st.session_state["agent"].execute_stream(
+                        description=description,
+                        image_paths=image_paths if image_paths else None,
+                        clip_id=clip_id.strip() or None,
+                        timestamp=timestamp.strip() or None,
+                    )
+                    st.write_stream(capture(stream))
 
-            # Add assistant message to history
-            st.session_state["messages"].append({
-                "role": "assistant",
-                "content": response_messages[-1] if response_messages else "Annotation completed"
-            })
-            st.success("✅ Annotation completed successfully!")
+                    state = st.session_state["agent"].last_state
+                    st.session_state["pending_state"] = state
 
-            # except Exception as e:
-            #     st.error(f"❌ Error: {str(e)}")
-            #     st.session_state["messages"].append({
-            #         "role": "assistant",
-            #         "content": f"Sorry, an error occurred: {str(e)}"
-            #     })
-            #     st.rerun()
+                st.session_state["messages"].append({
+                    "role": "assistant",
+                    "content": "Draft generated and waiting for human review."
+                })
+                st.success("✅ Draft generated. Please review before saving.")
+            except Exception as e:
+                st.error(f"❌ Error: {str(e)}")
+                st.session_state["messages"].append({
+                    "role": "assistant",
+                    "content": f"Sorry, an error occurred: {str(e)}"
+                })
+
+pending_state = st.session_state.get("pending_state")
+if pending_state:
+    st.markdown("---")
+    st.header("🔎 Human Review")
+    st.caption(f"Review status: {pending_state.review_status}")
+    st.json(pending_state.result.model_dump(mode="json"))
+
+    feedback = st.text_area(
+        "Reviewer feedback",
+        placeholder="Example: The traffic light should be green, and ego_vehicle.longitudinal_action should be maintain_speed.",
+        height=100,
+        key="review_feedback"
+    )
+
+    review_cols = st.columns(2)
+    with review_cols[0]:
+        if st.button("✅ Approve & Save", type="primary"):
+            try:
+                saved_state = st.session_state["agent"].approve_and_save(pending_state)
+                st.session_state["pending_state"] = None
+                st.session_state["last_result"] = saved_state.output_path
+                st.success(f"✅ Approved and saved to: {saved_state.output_path}")
+            except Exception as e:
+                st.error(f"❌ Save failed: {str(e)}")
+
+    with review_cols[1]:
+        if st.button("🛠️ Revise with Feedback", disabled=not feedback.strip()):
+            status = st.status("Feedback received. Revising annotation...", expanded=True)
+            status.write("MemoryAgent recorded your feedback.")
+            try:
+                with st.spinner("AnnotationWriterAgent is revising the JSON and QualityAgent is validating it..."):
+                    revised_state = st.session_state["agent"].revise_with_feedback(pending_state, feedback)
+                st.session_state["pending_state"] = revised_state
+                status.write("QualityAgent validation passed. Draft is ready for review again.")
+                status.update(label="Revision completed", state="complete")
+                st.success("✅ Revised draft generated. Please review again.")
+                st.rerun()
+            except Exception as e:
+                status.update(label="Revision failed", state="error")
+                st.error(f"❌ Revision failed: {str(e)}")
+
+if st.session_state.get("last_result") and os.path.exists(st.session_state["last_result"]):
+    with open(st.session_state["last_result"], "rb") as f:
+        st.download_button(
+            label="⬇️ Download latest JSON",
+            data=f,
+            file_name=os.path.basename(st.session_state["last_result"]),
+            mime="application/json"
+        )

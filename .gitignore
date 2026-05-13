@@ -2,5 +2,9 @@
 .idea
 .DS_Store
 **/__pycache__/
-/data/
+/data/*
+!/data/RAG/
+!/data/RAG/**
+!/data/detection_db/
+!/data/detection_db/**
 /logs/

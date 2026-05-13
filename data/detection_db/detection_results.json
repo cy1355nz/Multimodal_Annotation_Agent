@@ -1,0 +1,78 @@
+{
+  "frames": [
+    {
+      "clip_id": "clip_urban_red_light_001",
+      "timestamp": "1521055565282267",
+      "camera": "CAM_FRONT",
+      "detections": {
+        "lanes": [
+          {
+            "lane_id": "Lane1",
+            "bbox": [0, 410, 800, 600],
+            "is_ego": true,
+            "lane_type": "driving_lane",
+            "direction": "same_direction",
+            "confidence": 0.94
+          },
+          {
+            "lane_id": "Lane2",
+            "bbox": [800, 410, 1600, 600],
+            "is_ego": false,
+            "lane_type": "driving_lane",
+            "direction": "same_direction",
+            "confidence": 0.9
+          }
+        ],
+        "traffic_lights": [
+          {
+            "light_id": "light_1",
+            "bbox": [702, 24, 754, 86],
+            "color": "red",
+            "state": "solid",
+            "confidence": 0.97,
+            "applicable_lanes": ["Lane1"]
+          }
+        ],
+        "vehicles": [
+          {
+            "obj_id": "vehicle_1",
+            "bbox": [322, 245, 482, 382],
+            "type": "sedan",
+            "orientation": "rear",
+            "behavior": "stationary",
+            "confidence": 0.91
+          }
+        ],
+        "static_objects": []
+      }
+    },
+    {
+      "clip_id": "clip_obstacle_avoidance_002",
+      "timestamp": "1536761961012656",
+      "camera": "CAM_FRONT",
+      "detections": {
+        "lanes": [
+          {
+            "lane_id": "Lane1",
+            "bbox": [0, 400, 760, 600],
+            "is_ego": true,
+            "lane_type": "driving_lane",
+            "direction": "same_direction",
+            "confidence": 0.92
+          }
+        ],
+        "traffic_lights": [],
+        "vehicles": [],
+        "static_objects": [
+          {
+            "obj_id": "obj_1",
+            "bbox": [610, 315, 660, 355],
+            "type": "plastic_bag",
+            "position": "front_right",
+            "confidence": 0.82
+          }
+        ]
+      }
+    }
+  ]
+}
