@@ -45,6 +45,13 @@ Output: Structured JSON with annotation results
 
 <img src="Structure.drawio.svg" alt="描述" width="800">
 
+### Runtime sequence diagram
+<img src="runtime.png" alt="描述" width="800">
+
+### Retrieval-source diagram
+
+<img src="retrieval_source.png" alt="描述" width="800">
+
 ## 📂 Project Structure
 ```text
 ├── agent/
@@ -68,6 +75,8 @@ Output: Structured JSON with annotation results
 │   └── temp/                    # Runtime uploaded images
 ├── models/
 │   └── factory.py               # Model factory
+├── docs/
+│   └── agent_flow.md            # Mermaid diagrams for workflow and retrieval flow
 ├── prompts/
 │   ├── main_prompt.txt
 │   └── few_shot_examples.txt    # Few-shot prompt examples, not used as RAG corpus
